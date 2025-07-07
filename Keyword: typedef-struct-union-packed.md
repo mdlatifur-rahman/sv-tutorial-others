@@ -23,12 +23,12 @@ Here's a breakdown:
     Member Access: Only one member of a union can be accessed at a time.
     Writing a value to one member of a union will overwrite any value previously stored in another member because they share the same memory.
     Purpose: union is useful when you want to interpret a single memory location as multiple different data types or structures. It allows you to have different "views" or "interpretations" of the same underlying data. 
-Analogy:
-Struct: Imagine a closet with different shelves for different items. Each item has its own dedicated space.
-Union: Imagine a single box that can hold either a book, a hat, or a pair of shoes. You can only put one item in the box at a time, but the box needs to be large enough to hold the largest item. 
-Packed Structures and Unions in SystemVerilog:
-In SystemVerilog, the packed keyword can be used with both struct and union.
-Packed Struct: The members are packed together contiguously in memory, treated as a single vector of bits. This can be helpful for interfacing with hardware signals.
-Packed Union: All members must be the exact same size, and they share the same memory space. This provides different ways to access the same underlying bit vector. 
-In Summary:
+- Analogy:
+    -Struct: Imagine a closet with different shelves for different items. Each item has its own dedicated space.
+    -Union: Imagine a single box that can hold either a book, a hat, or a pair of shoes. You can only put one item in the box at a time, but the box needs to be large enough to hold the largest item. 
+  - Packed Structures and Unions in SystemVerilog:
+    In SystemVerilog, the packed keyword can be used with both struct and union.
+        - Packed Struct: The members are packed together contiguously in memory, treated as a single vector of bits. This can be helpful for interfacing with hardware signals.
+        - Packed Union: All members must be the exact same size, and they share the same memory space. This provides different ways to access the same underlying bit vector. 
+- In Summary:
 The key difference boils down to memory allocation: struct provides separate memory for each member, allowing simultaneous access, while union provides shared memory, allowing access to only one member at a time
