@@ -1,34 +1,116 @@
-# System Verilog typedef, struct, union
+# SystemVerilog Concepts
 
-Key Concepts Used:
-- typedef: Creates a new, user-defined data type with a specific name. This improves code readability and maintainability by allowing complex type declarations to be represented by a simpler name. According to FPGA Tutorial, typedef allows you to define new types built from predefined or user-defined types in Verilog and SystemVerilog.
-- **struct**: Groups several variables of different data types into a single unit.
-- **packed** : When applied to a struct or union, it indicates that the members should be stored contiguously in memory without gaps. This allows the entire structure or union to be treated as a single vector of bits.
-- **union**: Allows a single memory location to be interpreted as different data types. Only one member of a union can be active at any given time. 
-These structures and unions are commonly used in Verilog/SystemVerilog for designing hardware that processes or transmits data packets or flits. They provide a structured way to define the layout of these data structures and access their individual fields.
+This section provides explanations of key SystemVerilog constructs, formatted for easy integration into GitHub documentation.
 
+---
 
-# what is the difference between union and struct
+## `$clog2` System Function
 
-In both C and Verilog (specifically SystemVerilog), the key difference between a struct and a union lies in how they handle memory allocation and access to their members. 
-Here's a breakdown:
-- Struct (Structure):
-    - Memory Allocation: A struct allocates separate memory space for each of its members.
-    The total size of a structure is the sum of the sizes of all its members.
-    - Member Access: All members of a struct can be accessed simultaneously, as they have their own distinct memory locations.
-    - Purpose: A struct is used to group related data items of potentially different types into a single unit. This allows you to treat these related data as a single entity, making code more organized and readable, especially when passing bundles of signals in HDL designs. 
-    Union:
-    Memory Allocation: A union allocates memory space that is just large enough to hold the largest member.
-    All members of the union share this same memory location.
-    Member Access: Only one member of a union can be accessed at a time.
-    Writing a value to one member of a union will overwrite any value previously stored in another member because they share the same memory.
-    Purpose: union is useful when you want to interpret a single memory location as multiple different data types or structures. It allows you to have different "views" or "interpretations" of the same underlying data. 
-- Analogy:
-    -Struct: Imagine a closet with different shelves for different items. Each item has its own dedicated space.
-    -Union: Imagine a single box that can hold either a book, a hat, or a pair of shoes. You can only put one item in the box at a time, but the box needs to be large enough to hold the largest item. 
-  - Packed Structures and Unions in SystemVerilog:
-    In SystemVerilog, the packed keyword can be used with both struct and union.
-        - Packed Struct: The members are packed together contiguously in memory, treated as a single vector of bits. This can be helpful for interfacing with hardware signals.
-        - Packed Union: All members must be the exact same size, and they share the same memory space. This provides different ways to access the same underlying bit vector. 
-- In Summary:
-The key difference boils down to memory allocation: struct provides separate memory for each member, allowing simultaneous access, while union provides shared memory, allowing access to only one member at a time
+The `$clog2` function is a built-in SystemVerilog system function that calculates the ceiling of the base-2 logarithm of a given positive integer.
+
+### 🔍 Purpose
+
+- **Memory Addressing**: Determines the minimum number of bits required to address a memory with a given number of locations.  
+  _Example: A memory with 64 locations needs_ `clog2(64) = 6` _bits._
+
+- **Indexing and Looping**: Helps determine the bit width for index variables when working with arrays or data structures, improving efficiency.
+
+- **State Representation**: Calculates the minimum vector width to represent a given number of states.
+
+### 🧾 Syntax
+
+```systemverilog
+integer result = $clog2(value);
+```
+
+- `value`: A positive integer input.
+- `result`: Stores the ceiling of the base-2 logarithm of `value`.
+
+### 💡 Example
+
+```systemverilog
+parameter MEM_SIZE = 64;
+localparam ADDR_WIDTH = $clog2(MEM_SIZE); // ADDR_WIDTH will be 6
+```
+
+> 🔸 Note: `$clog2` is synthesizable if the argument is a constant. It was introduced in **Verilog-2005**.
+
+---
+
+## `typedef struct packed`
+
+The `typedef struct packed` construct defines a new data type grouping multiple variables into a contiguous memory layout.
+
+### 🔍 Purpose
+
+- **Data Encapsulation**: Combines related signals or data fields into a unit for better organization.
+- **Simplified Interfacing**: Useful for passing signal bundles between modules.
+- **Efficient Memory Utilization**: `packed` ensures no gaps between members—treated as a single bit vector.
+
+### 🧾 Syntax
+
+```systemverilog
+typedef struct packed {
+  type_1 member_1;
+  type_2 member_2;
+  // ...
+} struct_name;
+```
+
+### 💡 Example
+
+```systemverilog
+typedef struct packed {
+  logic [DEST_ADDR_SIZE_X-1 : 0] x_dest;
+  logic [DEST_ADDR_SIZE_Y-1 : 0] y_dest;
+  logic [HEAD_PAYLOAD_SIZE-1: 0] head_pl;
+} head_data_t;
+```
+
+> This defines a structure `head_data_t` grouping destination addresses and head payloads into a packed unit.
+
+---
+
+## `typedef union packed`
+
+The `typedef union packed` construct defines a type where all members share the same memory space. Only one member is accessible at a time.
+
+### 🔍 Purpose
+
+- **Multiple Data Interpretations**: Access memory using different formats.
+- **Memory Efficiency**: Uses memory of the largest member only.
+- **Simplified Data Handling**: Useful when data formats vary.
+
+### 🧾 Syntax
+
+```systemverilog
+typedef union packed {
+  type_1 member_1;
+  type_2 member_2;
+  // ...
+} union_name;
+```
+
+### 💡 Example
+
+```systemverilog
+union packed {
+  head_data_t head_data;
+  logic [FLIT_DATA_SIZE-1 : 0] bt_pl;
+} data;
+```
+
+> This allows interpreting `data` as either structured `head_data_t` or as a raw payload `bt_pl`.
+
+---
+
+## 🔄 Difference Between `struct` and `union`
+
+| Feature | `struct` | `union` |
+|--------|----------|---------|
+| Memory Allocation | Separate for each member | Shared across all members |
+| Access | All members accessible simultaneously | Only one member accessible at a time |
+| Use Case | Group related data | Represent multiple views of the same data |
+
+> ✅ Use `struct` when grouping signals.  
+> 🔄 Use `union` when you need to reinterpret memory.
