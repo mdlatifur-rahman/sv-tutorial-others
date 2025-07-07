@@ -8,7 +8,7 @@ union: Allows a single memory location to be interpreted as different data types
 These structures and unions are commonly used in Verilog/SystemVerilog for designing hardware that processes or transmits data packets or flits. They provide a structured way to define the layout of these data structures and access their individual fields.
 
 
-what is the difference between union and struct
+# what is the difference between union and struct
 
 In both C and Verilog (specifically SystemVerilog), the key difference between a struct and a union lies in how they handle memory allocation and access to their members. 
 Here's a breakdown:
