@@ -119,7 +119,6 @@ union packed {
 
 
 ### modport 
-You're looking at a **SystemVerilog `interface` construct**, specifically the definition of a `modport` named `upstream`. Let's break it down clearly and line by line.
 
 ---
 
@@ -205,5 +204,98 @@ Here, `producer` uses the interface in the **upstream role**, meaning it **produ
 
 ---
 
-Let me know if you'd like a downstream modport example too, or a complete testbench using this interface structure!
+
+### x [a] [$] ( DYNAMIC QUEUE)
+
+The line:
+
+```systemverilog
+flit_t packet_queue[PORT_NUM][$];
+```
+
+is a **SystemVerilog declaration** that defines a **2D array of dynamic queues**. Let’s break it down in detail:
+
+---
+
+### 🔹 Component-by-Component Breakdown
+
+#### ✅ `flit_t`
+
+This is a **user-defined type**, likely a `typedef struct` representing a **flit** (flow control digit). For example:
+
+```systemverilog
+typedef struct packed {
+    logic [1:0] flit_type;
+    logic [15:0] src;
+    logic [15:0] dest;
+    logic [63:0] payload;
+} flit_t;
+```
+
+Each element of the array/queue is one such flit.
+
+---
+
+#### ✅ `packet_queue`
+
+This is the name of the **2D data structure**, used to **store flits by port**.
+
+---
+
+#### ✅ `[PORT_NUM][$]`
+
+This is the most important part. It defines a:
+
+* **Fixed-size outer array** of size `PORT_NUM` (e.g., number of input/output ports of a router).
+* **Each element** of the outer array is a **SystemVerilog queue** (`$` indicates a **dynamic queue**) of type `flit_t`.
+
+### 🧠 Conceptually:
+
+```systemverilog
+packet_queue[0] = queue of flits for port 0
+packet_queue[1] = queue of flits for port 1
+...
+packet_queue[N-1] = queue of flits for port N-1
+```
+
+Each port has its own **FIFO-like queue** to store multiple incoming/outgoing flits.
+
+---
+
+### 🔸 Example Use
+
+```systemverilog
+// Add a flit to port 3's queue
+packet_queue[3].push_back(new_flit);
+
+// Read the front flit of port 0
+flit_t f = packet_queue[0].front();
+
+// Remove the front flit from port 2
+packet_queue[2].pop_front();
+```
+
+---
+
+### 🔹 Typical Use Case in NoC
+
+* In a **router**, `packet_queue` could be used to **temporarily buffer flits per input/output port** before arbitration, VC allocation, or switching.
+* Often part of **input buffering**, especially when modeling routers in cycle-accurate simulations.
+
+---
+
+### 🔹 Summary
+
+| Syntax         | Meaning                                            |
+| -------------- | -------------------------------------------------- |
+| `flit_t`       | A user-defined flit structure                      |
+| `[PORT_NUM]`   | Fixed-size array for each port                     |
+| `[$]`          | A dynamic queue (FIFO) per port                    |
+| `packet_queue` | Holds multiple packets/flits for each input/output |
+
+You’re essentially creating `PORT_NUM` separate FIFO queues, one for each port, to handle flit traffic independently.
+
+---
+
+
 
