@@ -114,3 +114,96 @@ union packed {
 
 > ✅ Use `struct` when grouping signals.  
 > 🔄 Use `union` when you need to reinterpret memory.
+
+
+
+
+### modport 
+You're looking at a **SystemVerilog `interface` construct**, specifically the definition of a `modport` named `upstream`. Let's break it down clearly and line by line.
+
+---
+
+### 🔹 What is a `modport`?
+
+In **SystemVerilog**, an `interface` is used to bundle related signals together, making module connections **cleaner and more reusable**.
+
+A **`modport`** (short for *module port*) defines the **direction of the signals** when the interface is used by a module. It lets different modules see different directions (input/output) of the same interface signals.
+
+---
+
+### 🔹 Breakdown of Your Code
+
+```systemverilog
+modport upstream (
+    output data,
+    output is_valid,
+    input  is_on_off,
+    input  is_allocatable
+);
+```
+
+This defines a **modport named `upstream`** with the following signal directions **from the point of view of the module that uses it**.
+
+| Signal           | Direction | Meaning for the module using the `upstream` modport                                 |
+| ---------------- | --------- | ----------------------------------------------------------------------------------- |
+| `data`           | `output`  | The module **drives** the `data` signal                                             |
+| `is_valid`       | `output`  | The module **drives** a flag indicating validity                                    |
+| `is_on_off`      | `input`   | The module **receives** the on/off status                                           |
+| `is_allocatable` | `input`   | The module **receives** a flag indicating if resources are available or allocatable |
+
+So if a module connects to this interface using `.upstream`, it must:
+
+* **output** the data and `is_valid` signals
+* **read** the `is_on_off` and `is_allocatable` flags as **inputs**
+
+---
+
+### 🔹 Example Usage Context
+
+#### Define Interface:
+
+```systemverilog
+interface link_if;
+    logic data;
+    logic is_valid;
+    logic is_on_off;
+    logic is_allocatable;
+
+    modport upstream (
+        output data,
+        output is_valid,
+        input  is_on_off,
+        input  is_allocatable
+    );
+endinterface
+```
+
+#### Module Using It:
+
+```systemverilog
+module producer(link_if.upstream link);
+    always_ff @(posedge clk) begin
+        if (link.is_on_off && link.is_allocatable) begin
+            link.data <= some_data;
+            link.is_valid <= 1'b1;
+        end else begin
+            link.is_valid <= 1'b0;
+        end
+    end
+endmodule
+```
+
+Here, `producer` uses the interface in the **upstream role**, meaning it **produces or sends data** when the downstream module is ready (as indicated by `is_on_off` and `is_allocatable`).
+
+---
+
+### 🔹 Summary
+
+* `modport upstream` defines how a module **interacts** with an interface.
+* It sets directions for each signal in the interface — like a customized view for different modules.
+* It's a cleaner alternative to passing many signals individually.
+
+---
+
+Let me know if you'd like a downstream modport example too, or a complete testbench using this interface structure!
+
