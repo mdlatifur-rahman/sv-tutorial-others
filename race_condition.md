@@ -13,7 +13,8 @@ always @* begin
   a <= 1;
   b <= a;
 end
-'''
+
+```
 What happens?
 
 At time 0: a = 0, b = 0.
