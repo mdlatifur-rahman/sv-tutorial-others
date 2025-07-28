@@ -1,17 +1,19 @@
-In SystemVerilog, when you use a non-blocking assignment (<=), the value on the left side does not change immediately. Instead, it gets updated at the end of the current simulation time step, after all statements in that time step have run.
+In SystemVerilog, when you use a non-blocking assignment (<=), the value on the left side does not change immediately. Instead, it gets updated at the end of the current simulation time step, after everything else scheduled for that time step.
 
 Simple Language:
 
 Non-blocking assignments (<=) "wait" until everything else scheduled for the current moment is done, then update the variable.
+
 Timing Example:
 
-SystemVerilog
+```systemverilog
 reg a = 0, b = 0;
 
 always @* begin
   a <= 1;
   b <= a;
 end
+
 What happens?
 
 At time 0: a = 0, b = 0.
