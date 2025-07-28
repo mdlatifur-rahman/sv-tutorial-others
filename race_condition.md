@@ -26,8 +26,7 @@ always @* begin
   b = a;
 end
 
----
-
+```
 
 
 
