@@ -29,14 +29,7 @@ end
 ```
 
 
-
-
-
-#Another Example:
-
-
-
-
+## Another Example:
 
 
 In SystemVerilog, when you use a non-blocking assignment (<=), the value on the left side does not change immediately. Instead, it gets updated at the end of the current simulation time step, after everything else scheduled for that time step.
@@ -150,7 +143,7 @@ end
 - Blocking (`=`) executes immediately, possibly affecting subsequent statements.
 - Non-blocking (`<=`) schedules assignments for the end of the time step, so all right-hand sides use values from before the block.
 
-If you’d like a specific example from the race.sv file in your repo, let me know!
+
 
 
 
