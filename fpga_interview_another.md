@@ -1,4 +1,4 @@
-````markdown name=fpga_mcq_practice_2.md
+
 ### Question 1
 **Which VHDL statement is used for concurrent signal assignment?**
 - [x] <=
