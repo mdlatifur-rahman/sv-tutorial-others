@@ -28,7 +28,7 @@
 
 ### 🔹 `static`
 - **Applies to**: Properties and methods
-- **Purpose**: Belongs to the class, not to any instance. Shared across all objects.
+- **Purpose**: Belongs to the class, not to any instance. Shared across all objects. Can't access non-static properties or methods inside a class.
 - **Example**:
   ```systemverilog
   class Counter;
